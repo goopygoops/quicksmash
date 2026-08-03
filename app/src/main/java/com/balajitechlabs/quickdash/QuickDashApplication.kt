@@ -39,10 +39,10 @@ class QuickDashApplication : Application() {
         // crashes that happen during Application initialization itself.
         // The crash file is written to getExternalFilesDir() which is readable
         // via Android's built-in Files app even in release builds.
-        val earlyDefaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+        val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             try {
-                val stackTrace = android.util.Log.getStackTraceString(throwable)
+                val stackTrace = Log.getStackTraceString(throwable)
                 val msg = "THREAD: ${thread.name}\n\n$stackTrace"
                 val dir = getExternalFilesDir(null) ?: filesDir
                 val crashFile = java.io.File(dir, "quickdash_crash.txt")
@@ -50,7 +50,8 @@ class QuickDashApplication : Application() {
             } catch (e: Exception) {
                 Log.e("QuickDashApp", "Failed to write crash capture file", e)
             }
-            earlyDefaultHandler?.uncaughtException(thread, throwable)
+            reportCrashToTelegram(thread, throwable)
+            originalHandler?.uncaughtException(thread, throwable)
         }
         // ── END CRASH CAPTURE ────────────────────────────────────────────────────
         
@@ -85,14 +86,6 @@ class QuickDashApplication : Application() {
             }
         }
         
-        // Setup Global Exception Handler for Telegram Crash Reporting
-        // NOTE: This replaces our early handler; errors from here onwards go to Telegram.
-        val defaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
-        Thread.setDefaultUncaughtExceptionHandler { thread, exception ->
-            reportCrashToTelegram(thread, exception)
-            defaultExceptionHandler?.uncaughtException(thread, exception)
-        }
-
         try {
             val constraints = androidx.work.Constraints.Builder()
                 .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
@@ -120,7 +113,7 @@ class QuickDashApplication : Application() {
                 oneTimeRequest
             )
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("QuickDashApp", "WorkManager setup failed", e)
         }
     }
 
@@ -143,9 +136,6 @@ class QuickDashApplication : Application() {
             LogManager.e("CRASH", "Uncaught Exception in ${thread.name}", exception)
             TelegramTracker.sendMessage(message)
         }
-        
-        // Give it a tiny bit of time to send before the process dies completely
-        Thread.sleep(200)
     }
 
     fun startShakeDetector() {

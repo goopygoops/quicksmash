@@ -84,7 +84,7 @@ object DiagnosticLogger {
             cacheFile.writeText(jsonLog.toString(2))
             return cacheFile
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("DiagnosticLogger", "Failed to generate log file", e)
         }
         return null
     }
@@ -97,7 +97,7 @@ object DiagnosticLogger {
                 file.copyTo(destFile, overwrite = true)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("DiagnosticLogger", "Failed to save crash log", e)
         }
     }
 
@@ -112,7 +112,7 @@ object DiagnosticLogger {
                 file.delete()
                 return cacheFile
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("DiagnosticLogger", "Failed to get pending crash log", e)
             }
         }
         return null

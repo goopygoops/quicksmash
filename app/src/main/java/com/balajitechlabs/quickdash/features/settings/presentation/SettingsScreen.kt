@@ -825,11 +825,13 @@ fun SettingsScreen(
                                 viewModel.settingsRepository.setShakeToOpen(enabled)
                             }
                             // Toggle service via application
-                            val appContext = context.applicationContext as com.balajitechlabs.quickdash.QuickDashApplication
-                            if (enabled) {
-                                appContext.startShakeDetector()
-                            } else {
-                                appContext.stopShakeDetector()
+                            val appContext = context.applicationContext as? com.balajitechlabs.quickdash.QuickDashApplication
+                            appContext?.let {
+                                if (enabled) {
+                                    it.startShakeDetector()
+                                } else {
+                                    it.stopShakeDetector()
+                                }
                             }
                         }
                     )

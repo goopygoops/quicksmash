@@ -36,7 +36,7 @@ object LogManager {
             val logLine = "[$timestamp] $level/$tag: $message\n"
             file.appendText(logLine)
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("LogManager", "LogManager init failed", e)
         }
     }
 
@@ -58,7 +58,7 @@ object LogManager {
                 logFile?.writeText("")
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("LogManager", "LogManager init failed", e)
         }
     }
 }

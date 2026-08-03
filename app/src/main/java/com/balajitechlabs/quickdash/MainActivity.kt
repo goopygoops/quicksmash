@@ -136,7 +136,7 @@ class MainActivity : FragmentActivity() {
             })
             .build()
 
-        androidx.core.content.pm.ShortcutManagerCompat.addDynamicShortcuts(this, listOf(searchShortcut, notesShortcut, wifiShortcut, calcShortcut, timerShortcut))
+        androidx.core.content.pm.ShortcutManagerCompat.setDynamicShortcuts(this, listOf(searchShortcut, notesShortcut, wifiShortcut, calcShortcut, timerShortcut))
         
         // Google Play Store APIs: In-App Updates & In-App Reviews (throttled)
         checkForPlayAppUpdate()
@@ -272,7 +272,7 @@ class MainActivity : FragmentActivity() {
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            AppLogger.e("MainActivity", "FCM token fetch failed", e)
         }
 
 
@@ -454,6 +454,11 @@ class MainActivity : FragmentActivity() {
         } catch (e: Exception) {
             AppLogger.e("MainActivity", "Failed to unregister closeAppReceiver", e)
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
     }
 
     private fun saveClipboardData() {

@@ -40,7 +40,7 @@ import androidx.activity.viewModels
 
 @AndroidEntryPoint
 class FloatingDialogActivity : FragmentActivity() {
-    private lateinit var userStore: UserStore
+    @Inject lateinit var userStore: UserStore
     private val mainViewModel: com.balajitechlabs.quickdash.MainViewModel by viewModels()
     private var isAuthenticated by mutableStateOf(false)
     private var isAuthRequired by mutableStateOf(false)
@@ -57,7 +57,6 @@ class FloatingDialogActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        userStore = UserStore(this)
         currentAction = intent?.getStringExtra("launch_section") ?: intent?.action
 
         val captureFilter = android.content.IntentFilter("com.balajitechlabs.quickdash.CAPTURE_WINDOW")
