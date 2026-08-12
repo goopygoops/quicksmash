@@ -139,7 +139,7 @@ class ScreenRecorderService : Service() {
                 mediaRecorder = recorder
                 true
             } catch (e: Exception) {
-                e.printStackTrace()
+                android.util.Log.e(TAG, "Screen recorder config failed", e)
                 false
             }
         }
@@ -163,15 +163,20 @@ class ScreenRecorderService : Service() {
         }, null)
 
         // Create VirtualDisplay fed into MediaRecorder
+        val recorder = mediaRecorder ?: run {
+            Log.e(TAG, "MediaRecorder is null when starting recording")
+            stopSelf()
+            return
+        }
         virtualDisplay = mediaProjection?.createVirtualDisplay(
             "QuickDashRecorder",
             width, height, density,
             DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-            mediaRecorder!!.surface,
+            recorder.surface,
             null, null
         )
 
-        mediaRecorder!!.start()
+        recorder.start()
         sendBroadcast(Intent(BROADCAST_RECORDING_STARTED).apply { `package` = packageName })
     }
 

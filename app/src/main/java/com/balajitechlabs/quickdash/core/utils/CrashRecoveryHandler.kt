@@ -1,6 +1,7 @@
 package com.balajitechlabs.quickdash.core.utils
 
 import android.content.Context
+import android.util.Log
 import java.io.File
 
 object CrashRecoveryHandler {
@@ -14,7 +15,7 @@ object CrashRecoveryHandler {
                 val file = File(context.filesDir, CRASH_FLAG_FILE)
                 file.writeText("CRASH: ${throwable.localizedMessage}\n${throwable.stackTraceToString()}")
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("CrashRecovery", "Failed to write crash flag", e)
             }
             defaultHandler?.uncaughtException(thread, throwable)
         }
@@ -30,7 +31,7 @@ object CrashRecoveryHandler {
             val file = File(context.filesDir, CRASH_FLAG_FILE)
             if (file.exists()) file.delete()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("CrashRecovery", "Failed to clear crash flag", e)
         }
     }
 }

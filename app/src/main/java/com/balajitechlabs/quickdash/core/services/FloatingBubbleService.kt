@@ -17,6 +17,9 @@ import android.widget.ImageView
 import com.balajitechlabs.quickdash.core.utils.AppLogger
 import com.balajitechlabs.quickdash.features.dashboard.presentation.FloatingDialogActivity
 import com.balajitechlabs.quickdash.R
+import com.balajitechlabs.quickdash.core.data.UserStore
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -62,7 +65,9 @@ class MySavedStateRegistryOwner : SavedStateRegistryOwner {
 }
 
 
+@AndroidEntryPoint
 class FloatingBubbleService : Service() {
+    @Inject lateinit var userStore: UserStore
     private val serviceScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.IO)
 
     @Suppress("DEPRECATION")
@@ -77,7 +82,7 @@ class FloatingBubbleService : Service() {
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            AppLogger.e("FloatingBubbleService", "Vibration failed", e)
         }
     }
 
@@ -93,7 +98,7 @@ class FloatingBubbleService : Service() {
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            AppLogger.e("FloatingBubbleService", "Vibration failed", e)
         }
     }
 
@@ -370,7 +375,6 @@ class FloatingBubbleService : Service() {
                             singleTapRunnable?.let { tapHandler.removeCallbacks(it) }
                             lastTapTime = 0L
                             triggerDoubleVibration()
-                            val userStore = com.balajitechlabs.quickdash.core.data.UserStore(this@FloatingBubbleService)
                             serviceScope.launch {
                                 userStore.setBubbleEnabled(false)
                             }

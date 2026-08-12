@@ -24,6 +24,8 @@ class QuickTileService : TileService() {
     @Inject
     lateinit var settingsRepository: SettingsRepository
 
+    private var clickJob: kotlinx.coroutines.Job? = null
+
     override fun onStartListening() {
         super.onStartListening()
         updateTileState()
@@ -34,7 +36,8 @@ class QuickTileService : TileService() {
         val tile = qsTile ?: return
         val context = applicationContext
 
-        CoroutineScope(Dispatchers.Main).launch {
+        clickJob?.cancel()
+        clickJob = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main).launch {
             val isEnabled = settingsRepository.bubbleEnabled.first()
             val newStatus = !isEnabled
             settingsRepository.setBubbleEnabled(newStatus)
@@ -72,7 +75,8 @@ class QuickTileService : TileService() {
     private fun updateTileState() {
         val tile = qsTile ?: return
 
-        CoroutineScope(Dispatchers.Main).launch {
+        clickJob?.cancel()
+        clickJob = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main).launch {
             val isEnabled = settingsRepository.bubbleEnabled.first()
             tile.state = if (isEnabled) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
             tile.updateTile()

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -120,7 +121,7 @@ object UpdateManager {
                     }
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("UpdateManager", "Failed to check for updates", e)
                 updateState = UpdateState.Error(e.localizedMessage ?: "Failed to check for updates")
                 hasLocalApk = hasDownloadedApk(context)
             }
@@ -174,7 +175,7 @@ object UpdateManager {
 
                 updateState = UpdateState.ReadyToInstall(remoteVersionName, fileName)
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("UpdateManager", "Download failed", e)
                 if (destFile.exists()) destFile.delete()
                 CoroutineScope(Dispatchers.Main).launch {
                     Toast.makeText(context, "Download failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
@@ -207,7 +208,7 @@ object UpdateManager {
             }
             context.startActivity(intent)
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("UpdateManager", "Install failed", e)
             Toast.makeText(context, "Install failed: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
         }
     }
